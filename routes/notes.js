@@ -3,47 +3,24 @@ const router = express.Router()
 const fetchUser = require("../middleware/fetchUser")
 const Note = require("../models/Notes")
 const { body, validationResult } = require('express-validator');
+const noteController = require('../controllers/Notes')
+
+//CRUD API- Create, Read, Update and Deletion of a note of a particular user
+
+//Route 1(GET): To get all notes of a particular user
+//READ
+router.get("/getallnotes", fetchUser, noteController.getAllNotes);
 
 
-router.get("/getallnotes", fetchUser, async (req, res) => {
-    try {
-        const notes = await Note.find({ user: req.user.id })
-        res.json(notes)
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).json({ error: err })
-    }
-
-})
-
+//Route 2(POST): Add a new note
 router.post("/addnote", fetchUser, [
     body("title", "Title is required").isLength({ min: 3 }),
     body("description", "Description is required and must be atleast 10 characters").isLength({ min: 10 })
-], async (req, res) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-        // console.log(errors.array()[0].msg)
-        return res.status(400).json({ errors: errors.array() })
-    }
-    try {
-        const note = new Note({
-            title: req.body.title,
-            description: req.body.description,
-            tag: req.body.tag,
-            user: req.user.id
-        })
+], noteController.addNewNote);
 
-        const savedNote = await note.save()
 
-        res.json(savedNote)
-
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({ error: "Internal Server Error" })
-    }
-})
-
+//Route 3(PATCH): Updation of a particular note created by the user
+//Update note
 router.patch("/updatenote/:id", fetchUser, async (req, res) => {
     try {
         const note = await Note.findById(req.params.id)
@@ -64,7 +41,8 @@ router.patch("/updatenote/:id", fetchUser, async (req, res) => {
     }
 })
 
-
+//Route 4(DELETE): Deletion of a particular note created by the user
+//Delete note
 router.delete("/deletenote/:id", fetchUser, async (req, res) => {
     try {
         let note = await Note.findById(req.params.id)

@@ -6,11 +6,6 @@ connectToMongo();
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-}
-);
-
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/notes', require('./routes/notes'));
 
