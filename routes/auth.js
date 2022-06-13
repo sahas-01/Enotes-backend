@@ -37,7 +37,7 @@ router.post('/', [
         };
         console.log(payload.id);
         const authToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
-        res.status(201).json({ authToken });
+        res.status(201).json({ success: true, authToken });
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: err });
